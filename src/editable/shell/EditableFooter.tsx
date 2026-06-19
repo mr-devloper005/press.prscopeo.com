@@ -1,44 +1,62 @@
 'use client'
 
 import Link from 'next/link'
-import { ArrowRight } from 'lucide-react'
+import { ArrowRight, Globe2 } from 'lucide-react'
 import { SITE_CONFIG } from '@/lib/site-config'
 import { globalContent } from '@/editable/content/global.content'
 import { useEditableLocalAuthSession } from '@/editable/components/EditableLocalAuthForms'
 
 export function EditableFooter() {
   const year = new Date().getFullYear()
-  const { session, logout } = useEditableLocalAuthSession()
+  const { session, logout, ready } = useEditableLocalAuthSession()
+  const groups: Array<[string, Array<[string, string]>]> = session
+    ? [
+        ['Navigation', [['Home', '/'], ['About', '/about'], ['Contact', '/contact'], ['Search', '/search']]],
+        ['Account', [['Logout', '#logout']]],
+      ]
+    : ready ? [
+        ['Navigation', [['Home', '/'], ['About', '/about'], ['Contact', '/contact'], ['Search', '/search']]],
+        ['Account', [['Login', '/login'], ['Register', '/signup']]],
+      ] : [['Navigation', [['Home', '/'], ['About', '/about'], ['Contact', '/contact'], ['Search', '/search']]]]
 
   return (
-    <footer className="border-t-8 border-[var(--slot4-accent)] bg-black text-white">
-      <div className="mx-auto max-w-[1440px] px-4 py-14 sm:px-6 lg:px-10 lg:py-20">
-        <div className="grid gap-12 lg:grid-cols-[1.2fr_.7fr_.7fr]">
-          <div>
-            <Link href="/" className="editorial-brand text-5xl font-black text-[var(--slot4-accent)] sm:text-6xl">{SITE_CONFIG.name}</Link>
-            <p className="mt-6 max-w-xl text-sm leading-7 text-white/62">{globalContent.footer?.description || SITE_CONFIG.description}</p>
-            <form action="/signup" className="mt-8 flex max-w-xl border border-white/35">
-              <input name="email" type="email" placeholder="Email for newsroom updates" className="min-w-0 flex-1 bg-transparent px-4 py-4 text-sm outline-none placeholder:text-white/40" />
-              <button className="bg-[var(--slot4-accent)] px-5 text-xs font-black uppercase tracking-[.14em]">Subscribe</button>
-            </form>
-          </div>
-          <div>
-            <h3 className="border-b border-white/25 pb-3 text-[10px] font-black uppercase tracking-[.22em] text-white/55">Explore</h3>
-            <div className="mt-4 grid gap-3">
-              <Link href="/search" className="group inline-flex items-center justify-between text-sm font-black uppercase tracking-[.08em] hover:text-[var(--slot4-accent)]">Archive<ArrowRight className="h-4 w-4" /></Link>
+    <footer className="bg-white text-[#111010]">
+      {!session ? (
+        <div className="border-y border-black/10 px-4 py-20 sm:px-6">
+          <Link href="/signup" className="mx-auto flex max-w-[1140px] items-center justify-between gap-8 rounded-lg bg-[linear-gradient(110deg,#bafff8,#56d8cf)] px-8 py-16 text-black transition hover:-translate-y-1 hover:shadow-[0_20px_70px_rgba(86,216,207,.28)] sm:px-12">
+            <span className="text-4xl font-medium tracking-[-0.04em] sm:text-5xl">Let&apos;s put media to work</span>
+            <ArrowRight className="h-12 w-12 shrink-0" />
+          </Link>
+        </div>
+      ) : null}
+
+      <div className="mx-auto max-w-[1280px] px-4 py-16 sm:px-6 lg:px-8">
+        <div className="grid gap-10 md:grid-cols-2">
+          {groups.map(([heading, links]) => (
+            <div key={heading}>
+              <h3 className="text-xs font-black uppercase tracking-[.38em]">{heading}</h3>
+              <div className="mt-7 grid gap-3">
+                {links.map(([label, href]) => href === '#logout' ? (
+                  <button key={label} onClick={logout} className="text-left text-sm text-black/78 hover:text-[#00bdb2]">{label}</button>
+                ) : (
+                  <Link key={label} href={href} className="text-sm text-black/78 hover:text-[#00bdb2]">{label}</Link>
+                ))}
+              </div>
             </div>
-          </div>
-          <div>
-            <h3 className="border-b border-white/25 pb-3 text-[10px] font-black uppercase tracking-[.22em] text-white/55">Publication</h3>
-            <div className="mt-4 grid gap-3">
-              <Link href="/about" className="text-sm font-black uppercase tracking-[.08em] hover:text-[var(--slot4-accent)]">About</Link>
-              <Link href="/contact" className="text-sm font-black uppercase tracking-[.08em] hover:text-[var(--slot4-accent)]">Contact</Link>
-              {session ? <><Link href="/create" className="text-sm font-black uppercase tracking-[.08em] hover:text-[var(--slot4-accent)]">Publish</Link><button onClick={logout} className="text-left text-sm font-black uppercase tracking-[.08em] hover:text-[var(--slot4-accent)]">Logout</button></> : <><Link href="/login" className="text-sm font-black uppercase tracking-[.08em] hover:text-[var(--slot4-accent)]">Log in</Link><Link href="/signup" className="text-sm font-black uppercase tracking-[.08em] hover:text-[var(--slot4-accent)]">Subscribe</Link></>}
-            </div>
-          </div>
+          ))}
         </div>
       </div>
-      <div className="border-t border-white/20 px-4 py-5 text-center text-[10px] font-black uppercase tracking-[.18em] text-white/45">© {year} {SITE_CONFIG.name}. Independent media and public information.</div>
+
+      <div className="border-t border-black/10">
+        <div className="mx-auto flex max-w-[1280px] flex-col gap-6 px-4 py-8 sm:px-6 lg:flex-row lg:items-center lg:justify-between lg:px-8">
+          <Link href="/" className="flex items-center gap-3 text-3xl font-semibold tracking-[-0.04em]">
+            <img src="/favicon.png" alt="" className="h-12 w-12 shrink-0 object-contain" />
+            {SITE_CONFIG.name}
+          </Link>
+          <p className="max-w-xl text-xs leading-6 text-black/55">{globalContent.footer?.description || SITE_CONFIG.description}</p>
+          <div className="flex items-center gap-3 text-xs text-black/55"><Globe2 className="h-4 w-4" /> (c) {year} {SITE_CONFIG.name}</div>
+        </div>
+      </div>
     </footer>
   )
 }

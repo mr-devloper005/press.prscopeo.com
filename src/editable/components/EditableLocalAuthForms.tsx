@@ -31,8 +31,8 @@ const saveSession = (user: Pick<LocalUser, 'name' | 'email'>) => {
   window.dispatchEvent(new Event('slot4-auth-change'))
 }
 
-const inputClass = 'h-[3.25rem] border border-black bg-white px-4 text-base font-bold text-black outline-none transition placeholder:text-black/35 focus:border-[#c92f2f]'
-const buttonClass = 'inline-flex h-[3.25rem] items-center justify-center border border-black bg-black px-6 text-xs font-black uppercase tracking-[0.2em] text-white transition hover:bg-[#c92f2f] disabled:opacity-60'
+const inputClass = 'h-[3.25rem] border border-black/20 bg-white px-4 text-base font-bold text-black outline-none transition placeholder:text-black/35 focus:border-[#00bdb2]'
+const buttonClass = 'inline-flex h-[3.25rem] items-center justify-center border border-black bg-black px-6 text-xs font-black uppercase tracking-[0.2em] text-white transition hover:bg-[#00bdb2] hover:text-black disabled:opacity-60'
 
 export function EditableLocalLoginForm() {
   const router = useRouter()
@@ -110,6 +110,7 @@ export function EditableLocalSignupForm() {
 
 export function useEditableLocalAuthSession() {
   const [session, setSession] = useState<{ name: string; email: string } | null>(null)
+  const [ready, setReady] = useState(false)
 
   useEffect(() => {
     const load = () => {
@@ -119,6 +120,7 @@ export function useEditableLocalAuthSession() {
       } catch {
         setSession(null)
       }
+      setReady(true)
     }
     load()
     window.addEventListener('slot4-auth-change', load)
@@ -133,7 +135,8 @@ export function useEditableLocalAuthSession() {
     window.localStorage.removeItem(SESSION_KEY)
     window.dispatchEvent(new Event('slot4-auth-change'))
     setSession(null)
+    setReady(true)
   }
 
-  return { session, logout }
+  return { session, logout, ready }
 }
